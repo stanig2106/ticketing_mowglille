@@ -32,12 +32,6 @@ export default class UsersController {
     return user;
   }
 
-  async destroy({ params }: HttpContext) {
-    const user = await User.findOrFail(params.id);
-    await user.delete();
-    return { message: 'User deleted' };
-  }
-
   // Admin routes may be used later
   async admin({ params, auth, response }: HttpContext) {
     if (auth.user!.role != User.roles.superAdmin)
@@ -56,10 +50,6 @@ export default class UsersController {
     user.role = User.roles.admin;
     await user.save();
     return { message: 'User is no longer admin' };
-  }
-
-  async store() {
-    return { message: "Can't add user manually" };
   }
 
   async cla({ request }: HttpContext) {

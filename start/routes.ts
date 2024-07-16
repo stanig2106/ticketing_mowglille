@@ -23,13 +23,9 @@ router.get('/', async () => {
 });
 
 //User routes
-router.post('users', [UsersController, 'store']);
 router.get('users', [UsersController, 'index']).use([middleware.auth()]);
 router.get('users/:id', [UsersController, 'show']).use([middleware.auth()]);
 router.put('users/:id', [UsersController, 'update']).use([middleware.auth()]);
-router
-  .delete('users/:id', [UsersController, 'destroy'])
-  .use([middleware.auth()]);
 
 //Event routes
 router
