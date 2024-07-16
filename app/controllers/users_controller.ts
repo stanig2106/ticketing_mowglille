@@ -1,10 +1,12 @@
-import type { HttpContext } from "@adonisjs/core/http";
-import Cla_info from "#models/cla_info";
-import User from "#models/user";
+import type { HttpContext } from '@adonisjs/core/http'
+import Cla_info from '#models/cla_info'
+import User from '#models/user'
 
 export default class UsersController {
   async cla(ctx: HttpContext) {
-    //TODO: implement validator
+    if (!ctx.request.hasBody() || !ctx.request.input('ticket')) {
+      return 'No ticket provided'
+    }
 
     const ticket = ctx.request.input('ticket')
     const fetchUrl = 'https://centralelilleassos.fr/authentification/billetterie/' + ticket
@@ -14,7 +16,7 @@ export default class UsersController {
       return response.statusText
     }
 
-    const responseJson = await response.json() as JSON
+    const responseJson = await response.json()
     const userinfos = responseJson['payload']
     console.log(userinfos)
     const claInfo = await Cla_info.firstOrCreate(
