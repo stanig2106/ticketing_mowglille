@@ -8,7 +8,7 @@
 */
 
 import router from '@adonisjs/core/services/router';
-import ClaInfo from '#models/cla_info';
+import { middleware } from '#start/kernel';
 
 const UsersController = () => import('#controllers/users_controller');
 
@@ -18,10 +18,11 @@ router.get('/', async () => {
   };
 });
 
-router.post('test', async ({ auth }) => {
-  // Authenticate using the default guard
-  const user = await auth.authenticate();
-  return await ClaInfo.find(user.cla_info_id);
-});
-
-router.get('cla', [UsersController, 'cla']);
+//User routes
+router.post('users', [UsersController, 'store']);
+router.get('users', [UsersController, 'index']).use([middleware.auth()]);
+router.get('users/:id', [UsersController, 'show']).use([middleware.auth()]);
+router.put('users/:id', [UsersController, 'update']).use([middleware.auth()]);
+router
+  .delete('users/:id', [UsersController, 'destroy'])
+  .use([middleware.auth()]);

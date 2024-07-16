@@ -1,10 +1,73 @@
 import type { HttpContext } from '@adonisjs/core/http';
+
 import ClaInfo from '#models/cla_info';
 import User from '#models/user';
 
 export default class UsersController {
+  async index() {
+    return User.all();
+  }
+
+  async show({ params }: HttpContext) {
+    return User.findOrFail(params.id);
+  }
+
+  async update({ params, request, auth, response }: HttpContext) {
+    const user = await User.findOrFail(params.id);
+    console.log(auth.user?.id);
+    console.log(params.id as number );
+    console.log(params.id as number !== auth.user?.id);
+    if (Number(params.id) !== auth.user?.id && auth.user?.role === 'user') {
+      response.forbidden("Can't change other user's info");
+    }
+
+    if (
+      request.body().role &&
+      user.role !== request.body().role &&
+      auth.user?.role !== 'super_admin'
+    ) {
+      response.forbidden(
+        "Can't change user's role unless you are a super admin"
+      );
+    }
+    user.merge(request.body());
+    await user.save();
+    return user;
+  }
+
+  async destroy({ params }: HttpContext) {
+    const user = await User.findOrFail(params.id);
+    await user.delete();
+    return { message: 'User deleted' };
+  }
+
+  // Admin routes may be used later
+  async admin({ params, auth, response }: HttpContext) {
+    if (!(auth.user?.role === 'super_admin')) {
+      return response.forbidden("You don't have the permission to do that");
+    }
+    const user = await User.findOrFail(params.id);
+    user.role = 'admin';
+    await user.save();
+    return { message: 'User is now admin' };
+  }
+
+  async unadmin({ params, auth, response }: HttpContext) {
+    if (!(auth.user?.role === 'super_admin')) {
+      return response.forbidden("You don't have the permission to do that");
+    }
+    const user = await User.findOrFail(params.id);
+    user.role = 'user';
+    await user.save();
+    return { message: 'User is no longer admin' };
+  }
+
+  async store() {
+    return { message: "Can't add user manually" };
+  }
+
   async cla({ request }: HttpContext) {
-    if (!request.hasBody() || !request.input('ticket')) {
+    if (!request.input('ticket')) {
       return 'No ticket provided';
     }
 
@@ -30,7 +93,7 @@ export default class UsersController {
       }
     );
     const user = await User.firstOrCreate({
-      cla_info_id: claInfo.id
+      claInfoId: claInfo.id
     });
     const token = await User.accessTokens.create(user);
     return { token: token.value!.release() };

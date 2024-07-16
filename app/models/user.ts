@@ -7,10 +7,13 @@ export default class User extends BaseModel {
   declare id: number;
 
   @column()
-  declare cla_info_id: number | null;
+  declare claInfoId: number | null;
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime;
+
+  @column()
+  declare role: string;
 
   static accessTokens = DbAccessTokensProvider.forModel(User);
 }
