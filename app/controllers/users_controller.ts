@@ -14,14 +14,14 @@ export default class UsersController {
 
   async update({ params, request, auth, response }: HttpContext) {
     const user = await User.findOrFail(params.id);
-    if (Number(params.id) !== auth.user?.id && auth.user?.role === 'user') {
+
+    if (params.id != auth.user?.id && auth.user?.role == User.roles.admin)
       response.forbidden("Can't change other user's info");
-    }
 
     if (
       request.body().role &&
       user.role !== request.body().role &&
-      auth.user?.role !== 'super_admin'
+      auth.user?.role !== User.roles.superAdmin
     ) {
       response.forbidden(
         "Can't change user's role unless you are a super admin"
@@ -40,21 +40,20 @@ export default class UsersController {
 
   // Admin routes may be used later
   async admin({ params, auth, response }: HttpContext) {
-    if (!(auth.user?.role === 'super_admin')) {
+    if (auth.user!.role != User.roles.superAdmin)
       return response.forbidden("You don't have the permission to do that");
-    }
+
     const user = await User.findOrFail(params.id);
-    user.role = 'admin';
+    user.role = User.roles.admin;
     await user.save();
     return { message: 'User is now admin' };
   }
 
   async unadmin({ params, auth, response }: HttpContext) {
-    if (!(auth.user?.role === 'super_admin')) {
+    if (auth.user?.role != User.roles.superAdmin)
       return response.forbidden("You don't have the permission to do that");
-    }
     const user = await User.findOrFail(params.id);
-    user.role = 'user';
+    user.role = User.roles.admin;
     await user.save();
     return { message: 'User is no longer admin' };
   }
