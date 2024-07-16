@@ -1,6 +1,6 @@
-import { BaseModel, column } from '@adonisjs/lucid/orm'
+import { BaseModel, column } from '@adonisjs/lucid/orm';
 
-export default class Cla_info extends BaseModel {
+export default class ClaInfo extends BaseModel {
   @column({ isPrimary: true }) declare id: number;
 
   @column() declare username: string;
