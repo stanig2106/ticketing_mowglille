@@ -14,9 +14,6 @@ export default class UsersController {
 
   async update({ params, request, auth, response }: HttpContext) {
     const user = await User.findOrFail(params.id);
-    console.log(auth.user?.id);
-    console.log(params.id as number );
-    console.log(params.id as number !== auth.user?.id);
     if (Number(params.id) !== auth.user?.id && auth.user?.role === 'user') {
       response.forbidden("Can't change other user's info");
     }
