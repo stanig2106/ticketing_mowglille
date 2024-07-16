@@ -10,6 +10,7 @@
 import router from '@adonisjs/core/services/router';
 import { middleware } from '#start/kernel';
 import EventsController from '#controllers/events_controller';
+import AssociationsController from "#controllers/associations_controller";
 
 const UsersController = () => import('#controllers/users_controller');
 
@@ -38,6 +39,22 @@ router
   .put('events/:id', [EventsController, 'update'])
   .use([middleware.auth(), middleware.admin()]);
 router
-  .delete('events/:id', [EventsController, 'destroy'
-  ])
+  .delete('events/:id', [EventsController, 'destroy'])
+  .use([middleware.auth(), middleware.admin()]);
+
+//Assosiation routes
+router
+  .post('associations/', [AssociationsController, 'store'])
+  .use([middleware.auth(), middleware.admin()]);
+router
+  .get('associations/', [AssociationsController, 'index'])
+  .use([middleware.auth()]);
+router
+  .get('associations/:id', [AssociationsController, 'show'])
+  .use([middleware.auth()]);
+router
+  .put('associations/:id', [AssociationsController, 'update'])
+  .use([middleware.auth(), middleware.admin()]);
+router
+  .delete('associations/:id', [AssociationsController, 'destroy'])
   .use([middleware.auth(), middleware.admin()]);
