@@ -1,5 +1,7 @@
 import { DateTime } from 'luxon';
-import { BaseModel, column } from '@adonisjs/lucid/orm';
+import { BaseModel, column, hasOne } from '@adonisjs/lucid/orm';
+import PricePack from '#models/price_pack';
+import type { HasOne } from '@adonisjs/lucid/types/relations';
 
 export default class Event extends BaseModel {
   @column({ isPrimary: true })
@@ -26,8 +28,8 @@ export default class Event extends BaseModel {
   @column()
   declare timeToPay: number;
 
-  @column()
-  declare pricePackId: number;
+  @hasOne(() => PricePack)
+  declare pricePack: HasOne<typeof PricePack>;
 
   @column()
   declare bannerUrl: string;

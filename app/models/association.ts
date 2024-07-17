@@ -12,4 +12,7 @@ export default class Association extends BaseModel {
 
   @column()
   declare color: string;
+
+  @column()
+  declare sold: number;
 }

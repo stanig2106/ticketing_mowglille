@@ -32,26 +32,6 @@ export default class UsersController {
     return user;
   }
 
-  // Admin routes may be used later
-  async admin({ params, auth, response }: HttpContext) {
-    if (auth.user!.role != User.roles.superAdmin)
-      return response.forbidden("You don't have the permission to do that");
-
-    const user = await User.findOrFail(params.id);
-    user.role = User.roles.admin;
-    await user.save();
-    return { message: 'User is now admin' };
-  }
-
-  async unadmin({ params, auth, response }: HttpContext) {
-    if (auth.user?.role != User.roles.superAdmin)
-      return response.forbidden("You don't have the permission to do that");
-    const user = await User.findOrFail(params.id);
-    user.role = User.roles.admin;
-    await user.save();
-    return { message: 'User is no longer admin' };
-  }
-
   async cla({ request }: HttpContext) {
     if (!request.input('ticket')) {
       return 'No ticket provided';
@@ -66,21 +46,23 @@ export default class UsersController {
       return response.statusText;
     }
 
-    const responseJson = (await response.json()) as Record<string, any>;
-    const userInfos = responseJson['payload'];
+    const responseJson = (await response.json()) as { payload: ClaInfo };
+    const userInfos = responseJson.payload;
     const claInfo = await ClaInfo.firstOrCreate(
-      { username: userInfos['username'] },
-      {
-        first_name: userInfos['firstName'],
-        last_name: userInfos['lastName'],
-        school_email: userInfos['emailSchool'],
-        cursus: userInfos['cursus'],
-        promo: userInfos['promo']
-      }
+      { username: userInfos.username },
+      userInfos
     );
-    const user = await User.firstOrCreate({
-      claInfoId: claInfo.id
-    });
+
+    // prettier-ignore
+    const user = (await User.query().whereHas('claInfo',
+      (query) => query.where('id', claInfo.id)
+    ).first()) || (await (async () => {
+      const res = new User()
+      await res.related('claInfo').associate(claInfo)
+      await res.save()
+      return res
+    })())
+
     const token = await User.accessTokens.create(user);
     return { token: token.value!.release() };
   }

@@ -1,13 +1,15 @@
 import { DateTime } from 'luxon';
-import { BaseModel, column } from '@adonisjs/lucid/orm';
+import { BaseModel, belongsTo, column } from '@adonisjs/lucid/orm';
 import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens';
+import type { BelongsTo } from '@adonisjs/lucid/types/relations';
+import ClaInfo from '#models/cla_info';
 
 export default class User extends BaseModel {
   @column({ isPrimary: true })
   declare id: number;
 
-  @column()
-  declare claInfoId: number | null;
+  @belongsTo(() => ClaInfo)
+  declare claInfo: BelongsTo<typeof ClaInfo>;
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime;
@@ -18,7 +20,7 @@ export default class User extends BaseModel {
     superAdmin: 2
   };
   @column()
-  declare role: number;
+  declare role: (typeof User.roles)[keyof typeof User.roles];
 
   static accessTokens = DbAccessTokensProvider.forModel(User);
 }

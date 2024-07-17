@@ -6,9 +6,10 @@ export default class PricePacks extends BaseSchema {
   async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id');
+
       table.string('name').notNullable();
 
-      table.timestamps(true);
+      table.integer('quantity').checkPositive().notNullable();
     });
   }
 
