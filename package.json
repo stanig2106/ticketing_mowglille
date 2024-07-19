@@ -13,6 +13,10 @@
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit"
   },
+  "engines": {
+    "node": ">=22",
+    "npm": ">=8"
+  },
   "imports": {
     "#controllers/*": "./app/controllers/*.js",
     "#exceptions/*": "./app/exceptions/*.js",
@@ -68,6 +72,9 @@
   },
   "eslintConfig": {
     "extends": "@adonisjs/eslint-config/app",
+    "ignorePatterns": [
+      "/vue/*"
+    ],
     "rules": {
       "eqeqeq": "off",
       "no-eq-null": "warn"

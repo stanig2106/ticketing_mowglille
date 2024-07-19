@@ -14,7 +14,7 @@ export default class User extends BaseModel {
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime;
 
-  static roles = {
+  static readonly roles = {
     user: 0,
     admin: 1,
     superAdmin: 2
@@ -22,5 +22,5 @@ export default class User extends BaseModel {
   @column()
   declare role: (typeof User.roles)[keyof typeof User.roles];
 
-  static accessTokens = DbAccessTokensProvider.forModel(User);
+  static readonly accessTokens = DbAccessTokensProvider.forModel(User);
 }
