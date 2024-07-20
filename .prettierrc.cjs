@@ -5,5 +5,6 @@ module.exports = {
   ...adonisPrettierConfig,
   semi: true,
   printWidth: 80,
-  trailingComma: 'none'
+  trailingComma: 'none',
+  bracketSameLine: true
 };
